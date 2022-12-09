@@ -11,30 +11,30 @@
 #
 DEMO_PROMPT="${BLUE}➜ ${BLUE}\W "
 
-pei "Enter the Hostname (FQDN) of your private registry (e.g. registry.cloud-garage.net)"
+pei "echo 'Enter the Hostname (FQDN) of your private registry (e.g. registry.cloud-garage.net)'"
 read INSTALL_REGISTRY_HOSTNAME
 
-pei "Enter the username which is going to be used for your private registry (e.g. rguske)"
+pei "echo 'Enter the username which is going to be used for your private registry (e.g. cpod-dvc)'"
 read INSTALL_REGISTRY_USERNAME
 
-pei "Enter the password for the provided user"
+pei "echo 'Enter the password for the provided user'"
 read INSTALL_REGISTRY_PASSWORD
 
-pei "Enter the desired TAP version (e.g. 1.3.0)"
+pei "echo 'Enter the desired TAP version (e.g. 1.3.0)'"
 read TAP_VERSION
 
-pei "Enter the desired TAP version (e.g. rguske/tap-packages)"
+pei "echo 'Enter the desired TAP version (e.g. rguske/tap-packages)'"
 read INSTALL_REPO
 
 # hide the evidences
 clear
 
 # Export Registry and Repository Variales
-# pei "export INSTALL_REGISTRY_USERNAME=rguske \
+# export INSTALL_REGISTRY_USERNAME='cpod-svc' \
 # export INSTALL_REGISTRY_PASSWORD='' \
 # export INSTALL_REGISTRY_HOSTNAME='registry.cloud-garage.net' \
 # export TAP_VERSION=1.3.0 \
-# export INSTALL_REPO=rguske/tap-packages"
+# export INSTALL_REPO=rguske/tap-packages
 
 # print out Tanzu Packages
 pei "figlet Preperations - Tanzu Packages  | lolcat"
@@ -183,7 +183,7 @@ pe "tanzu secret registry add tap-registry \
 
 # Add the new Package Repository
 pe "tanzu package repository add tanzu-tap-repo \
---url ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}/tap-packages:$TAP_VERSION \
+--url ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}:$TAP_VERSION \
 --namespace tap-install"
 
 # Check the Repository Config
