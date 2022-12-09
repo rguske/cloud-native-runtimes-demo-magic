@@ -11,17 +11,30 @@
 #
 DEMO_PROMPT="${BLUE}➜ ${BLUE}\W "
 
-read PRIVATE_REGISTRY_PASSWORD
+pei "Enter the Hostname (FQDN) of your private registry (e.g. registry.cloud-garage.net)"
+read INSTALL_REGISTRY_HOSTNAME
 
-# hide the evidence
+pei "Enter the username which is going to be used for your private registry (e.g. rguske)"
+read INSTALL_REGISTRY_USERNAME
+
+pei "Enter the password for the provided user"
+read INSTALL_REGISTRY_PASSWORD
+
+pei "Enter the desired TAP version (e.g. 1.3.0)"
+read TAP_VERSION
+
+pei "Enter the desired TAP version (e.g. rguske/tap-packages)"
+read INSTALL_REPO
+
+# hide the evidences
 clear
 
 # Export Registry and Repository Variales
-pei "export INSTALL_REGISTRY_USERNAME=admin \
-export INSTALL_REGISTRY_PASSWORD='VMware1!' \
-export INSTALL_REGISTRY_HOSTNAME='registry.cloud-garage.net' \
-export TAP_VERSION=1.3.0 \
-export INSTALL_REPO=rguske/tap-packages"
+# pei "export INSTALL_REGISTRY_USERNAME=rguske \
+# export INSTALL_REGISTRY_PASSWORD='' \
+# export INSTALL_REGISTRY_HOSTNAME='registry.cloud-garage.net' \
+# export TAP_VERSION=1.3.0 \
+# export INSTALL_REPO=rguske/tap-packages"
 
 # print out Tanzu Packages
 pei "figlet Preperations - Tanzu Packages  | lolcat"
@@ -233,8 +246,8 @@ stringData:
   .dockerconfigjson: |
     {
       'auths': {
-        'registry.cloud-garage.net': {
-          'username': 'rguske',
+        '${INSTALL_REGISTRY_HOSTNAME}': {
+          'username': '${INSTALL_REGISTRY_USERNAME}',
           'password': '${PRIVATE_REGISTRY_PASSWORD}',
           'auth': ''
         }
