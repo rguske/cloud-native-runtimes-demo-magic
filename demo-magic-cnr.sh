@@ -166,10 +166,10 @@ stringData:
 EOF"
 
 # Show Load Balancer IP assignment for Envoy
-pei "kubectl -n tanzu-system-ingress get svc"
+pe "kubectl -n tanzu-system-ingress get svc"
 
 # Show DNS Wildcard Config for CNR
-pei "figlet DNS Wildcard Config | lolcat"
+pei "figlet Adjust your DNS Wildcard Record | lolcat"
 
 # Create TAP Namespace
 pe "kubectl create ns tap-install"
@@ -217,8 +217,11 @@ pe "tanzu package install eventing \
 # Create vmware-functions namespace
 pe "kubectl create ns vmware-functions"
 
-# Create tanzu-rabbitmq namespace
+# Create tanzu-rabbitmq-package namespace
 pe "kubectl create ns tanzu-rabbitmq-package"
+
+# Create tanzu-rabbitmq-package namespace
+pe "kubectl create ns tanzu-rabbitmq"
 
 # Add Tanzu-RabbitMQ Package Repository
 pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
@@ -234,7 +237,7 @@ spec:
 EOF"
 
 # Create Registry Secret for the Tanzu-RabbitMQ Repository
-pe "kubectl create -f - <<EOF
+pe 'kubectl create -f - <<EOF
 ---
 apiVersion: v1
 kind: Secret
@@ -245,15 +248,15 @@ type: kubernetes.io/dockerconfigjson
 stringData:
   .dockerconfigjson: |
     {
-      'auths': {
-        '${INSTALL_REGISTRY_HOSTNAME}': {
-          'username': '${INSTALL_REGISTRY_USERNAME}',
-          'password': '${PRIVATE_REGISTRY_PASSWORD}',
-          'auth': ''
+      "auths": {
+        "${INSTALL_REGISTRY_HOSTNAME}": {
+          "username": "${INSTALL_REGISTRY_USERNAME}",
+          "password": "${INSTALL_REGISTRY_PASSWORD}",
+          "auth": ""
         }
       }
     }
-EOF"
+EOF'
 
 # Export the Secret to every Namespace
 pe "kubectl create -f - <<EOF
@@ -269,7 +272,7 @@ spec:
 EOF"
 
 # Create Tanzu-RabbitMQ SA
-pe "kubectl create -f - <<EOF
+pe 'kubectl create -f - <<EOF
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRole
@@ -282,26 +285,26 @@ rules:
   - validatingwebhookconfigurations
   - mutatingwebhookconfigurations
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - apiextensions.k8s.io
   resources:
   - customresourcedefinitions
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - apps
   resources:
   - deployments
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - cert-manager.io
   resources:
   - certificates
   - issuers
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - ""
   resources:
@@ -311,7 +314,7 @@ rules:
   - serviceaccounts
   - services
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - rbac.authorization.k8s.io
   resources:
@@ -320,13 +323,13 @@ rules:
   - rolebindings
   - roles
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - coordination.k8s.io
   resources:
   - leases
   verbs:
-  - '*'
+  - "*"
 - apiGroups:
   - ""
   resources:
@@ -383,15 +386,15 @@ rules:
   - rabbitmq.com
   - rabbitmq.tanzu.vmware.com
   resources:
-  - '*'
+  - "*"
   verbs:
-  - '*'
+  - "*"
 ---
 apiVersion: v1
 kind: ServiceAccount
 metadata:
   name: tanzu-rabbitmq-sa
-  namespace: tanzu-rabbitmq
+  namespace: tanzu-rabbitmq-package
 ---
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
@@ -404,11 +407,11 @@ roleRef:
 subjects:
 - kind: ServiceAccount
   name: tanzu-rabbitmq-sa
-  namespace: tanzu-rabbitmq
-EOF"
+  namespace: tanzu-rabbitmq-package
+EOF'
 
 # Create Tanzu-RabbitMQ PackageInstall
-pe "kubectl -n tanzu-rabbitmq create -f - <<EOF
+pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
 ---
 apiVersion: packaging.carvel.dev/v1alpha1
 kind: PackageInstall
@@ -419,7 +422,7 @@ spec:
   packageRef:
     refName: rabbitmq.tanzu.vmware.com
     versionSelection:
-      constraints: 1.3.1
+            constraints: 1.3.1
   values:
   - secretRef:
       name: tanzu-rabbitmq-values
@@ -435,7 +438,7 @@ stringData:
 EOF"
 
 # Createthe first RabbitMQ Cluster
-pe "kubectl create -f - <<EOF
+pe 'kubectl create -f - <<EOF
 ---
 apiVersion: v1
 kind: Secret
@@ -454,15 +457,15 @@ metadata:
   name: tanzu-rabbitmq-cl-1
   namespace: tanzu-rabbitmq
   annotations:
-    rabbitmq.com/topology-allowed-namespaces: 'vmware-functions'
+    rabbitmq.com/topology-allowed-namespaces: "vmware-functions"
 spec:
   replicas: 1
   imagePullSecrets:
   - name: tanzu-rabbitmq-registry-creds
-EOF"
+EOF'
 
 # Create the RabbitMQ Broker for Knative
-pe "kubectl -f - <<EOF
+pe "kubectl create -f - <<EOF
 ---
 apiVersion: eventing.knative.dev/v1
 kind: Broker
@@ -476,7 +479,7 @@ spec:
     apiVersion: rabbitmq.com/v1beta1
     kind: RabbitmqCluster
     name: tanzu-rabbitmq-cl-1
-    namespace: rabbitmq
+    namespace: tanzu-rabbitmq
   delivery:
     retry: 2
     backoffPolicy: linear
@@ -572,6 +575,9 @@ spec:
       name: sockeye
 EOF"
 
+# Show assigned Load Balancer IP for Sockeye
+pe "kubectl -n vmware-functions get svc"
+
 # Create tagging Secret
 pe "kubectl -n vmware-functions create secret generic tag-secret --from-file=TAG_SECRET=tag_secret.json"
 
@@ -616,6 +622,9 @@ spec:
       kind: Service
       name: kn-pcli-tag
 EOF"
+
+# Finish
+pei "figlet 'Eventing is the sh**' | lolcat"
 
 # wait max 3 seconds until user presses
 PROMPT_TIMEOUT=3

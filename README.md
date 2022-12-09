@@ -8,6 +8,8 @@ This demo-magic script will install the following solutions, as VMware Packages 
   * Perform this step first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
 * Running Kubernetes cluster with enough capacity (compute)
   * I'd recommend at least two large worker-nodes (e.g. 2-4 vCPUs and 8 - 16GB vRAM each)
+* A configured default `StorageClass` in Kubernetes
+  * `kubectl patch storageclass gold -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'`
 * A Load Balancer solution in place
 * The possibility to configure a [DNS Wildcard Record](https://en.wikipedia.org/wiki/Wildcard_DNS_record)
 * An existing vSphere Tag (mine: `backup-basic-sla`) which will be used by the exampple function in the script
