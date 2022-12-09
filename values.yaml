@@ -1,0 +1,8 @@
+---
+domain_name: "cnr.cpod-nsxv8.az-stc.cloud-garage.net"
+---
+ingress:
+  external:
+    namespace: "tanzu-system-ingress"
+  internal:
+    namespace: "tanzu-system-ingress"

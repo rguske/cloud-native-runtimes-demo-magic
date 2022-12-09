@@ -181,14 +181,14 @@ pe "tanzu package repository get tanzu-tap-repo \
 pe "tanzu package available get cnrs.tanzu.vmware.com --namespace tap-install"
 
 # Show CNR value file
-pe "cat cnr-values.yaml"
+pe "cat values.yaml"
 
 # Install the CNR Package
 pe "tanzu package install cloud-native-runtimes \
 -p cnrs.tanzu.vmware.com \
 -v 2.0.1 \
 -n tap-install \
--f cnr-values.yaml \
+-f values.yaml \
 --poll-timeout 30m"
 
 # Check Eventing version availability
