@@ -4,21 +4,23 @@ This demo-magic script will install the following solutions, as VMware Packages 
 
 ## Prerequisites
 
-* The biggest part of the necessary prerequisites is the relocation of the Tanzu packages for Tanzu Application Platform
-  * Perform this step first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
-* Running Kubernetes cluster with enough capacity (compute)
+* the biggest part of the necessary prerequisites is the relocation of the Tanzu Packages for Tanzu Application Platform
+  * Perform these steps first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
+* running Kubernetes cluster with enough capacity (compute)
   * I'd recommend at least two large worker-nodes (e.g. 2-4 vCPUs and 8 - 16GB vRAM each)
-* A configured default `StorageClass` in Kubernetes
+* a configured default `StorageClass` in Kubernetes
   * `kubectl patch storageclass gold -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'`
-* A Load Balancer solution in place
-* The possibility to configure a [DNS Wildcard Record](https://en.wikipedia.org/wiki/Wildcard_DNS_record)
-* An existing vSphere Tag (mine: `backup-basic-sla`) which will be used by the exampple function in the script
-  * I also created dedicated service-use (`svc-tagging`) in order to perform the tagging operation
-* A ReadOnly user in vSphere which we'll use in order to connect the `VsphereSource` to the vCenter Event Stream
-* Installed Knative (`kn`) CLI - [LINK](https://knative.dev/docs/client/install-kn/)
+  * we need `persistentVolumes` for RabbitMQ
+* a Load Balancer solution in place
+  * we need VIP's for various services
+* the possibility to configure a [DNS Wildcard Record](https://en.wikipedia.org/wiki/Wildcard_DNS_record)
+* an existing vSphere Tag (mine: `backup-basic-sla`) which will be used by the example tagging-function in the script
+  * I also created a dedicated service-user (`svc-tagging`) which will be used by the tagging operation
+* a `ReadOnly` user in vSphere which we'll use in order to connect the `VsphereSource` to the vCenter Server (Event API)
+* installed Knative (`kn`) CLI - [LINK](https://knative.dev/docs/client/install-kn/)
 * `kn vsphere` [Plugin installed](https://github.com/vmware-tanzu/sources-for-knative/tree/main/plugins/vsphere) - [LINK](https://github.com/vmware-tanzu/sources-for-knative/releases)
-  * download the binary and `mv` it to `/usr/local/bin/`
-* Internet access is required
+  * download the binary and `mv` it to `/usr/local/bin/` (on Linux)
+* internet access is required
 
 ## VMware Packages and Versions
 
