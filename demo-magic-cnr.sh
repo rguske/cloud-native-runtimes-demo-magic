@@ -45,6 +45,9 @@ pei "tanzu package repository add tanzu-standard --url projects.registry.vmware.
 # Show available packages
 pe "tanzu package available list -n tkg-system"
 
+# hide the evidences
+clear
+
 # Install Cert-Manager
 pe "kubectl create -f - <<EOF
 ---
@@ -92,6 +95,9 @@ stringData:
     ---
     namespace: cert-manager
 EOF"
+
+# hide the evidences
+clear
 
 # Install Contour
 pe "kubectl create -f - <<EOF
@@ -165,11 +171,17 @@ stringData:
      renewBefore: 360h
 EOF"
 
+# hide the evidences
+clear
+
 # Show Load Balancer IP assignment for Envoy
 pe "kubectl -n tanzu-system-ingress get svc"
 
 # Show DNS Wildcard Config for CNR
 pei "figlet Adjust your DNS Wildcard Record | lolcat"
+
+# hide the evidences
+clear
 
 # Create TAP Namespace
 pe "kubectl create ns tap-install"
@@ -181,10 +193,16 @@ pe "tanzu secret registry add tap-registry \
 --export-to-all-namespaces --yes \
 --namespace tap-install"
 
+# hide the evidences
+clear
+
 # Add the new Package Repository
 pe "tanzu package repository add tanzu-tap-repo \
 --url ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}:$TAP_VERSION \
 --namespace tap-install"
+
+# hide the evidences
+clear
 
 # Check the Repository Config
 pe "tanzu package repository get tanzu-tap-repo \
@@ -193,8 +211,14 @@ pe "tanzu package repository get tanzu-tap-repo \
 # Check CNR version availability
 pe "tanzu package available get cnrs.tanzu.vmware.com --namespace tap-install"
 
+# hide the evidences
+clear
+
 # Show CNR value file
 pe "cat values.yaml"
+
+# hide the evidences
+clear
 
 # Install the CNR Package
 pe "tanzu package install cloud-native-runtimes \
@@ -203,6 +227,9 @@ pe "tanzu package install cloud-native-runtimes \
 -n tap-install \
 -f values.yaml \
 --poll-timeout 30m"
+
+# hide the evidences
+clear
 
 # Check Eventing version availability
 pe "tanzu package available get eventing.tanzu.vmware.com --namespace tap-install"
@@ -214,6 +241,9 @@ pe "tanzu package install eventing \
 -n tap-install \
 --poll-timeout 30m"
 
+# hide the evidences
+clear
+
 # Create vmware-functions namespace
 pe "kubectl create ns vmware-functions"
 
@@ -222,6 +252,9 @@ pe "kubectl create ns tanzu-rabbitmq-package"
 
 # Create tanzu-rabbitmq-package namespace
 pe "kubectl create ns tanzu-rabbitmq"
+
+# hide the evidences
+clear
 
 # Add Tanzu-RabbitMQ Package Repository
 pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
@@ -235,6 +268,9 @@ spec:
     imgpkgBundle:
       image: registry.cloud-garage.net/jmanzaneque/tanzu-rabbitmq-package-repo:1.3.1
 EOF"
+
+# hide the evidences
+clear
 
 # Create Registry Secret for the Tanzu-RabbitMQ Repository
 pe 'kubectl create -f - <<EOF
@@ -258,6 +294,9 @@ stringData:
     }
 EOF'
 
+# hide the evidences
+clear
+
 # Export the Secret to every Namespace
 pe "kubectl create -f - <<EOF
 ---
@@ -270,6 +309,9 @@ spec:
   toNamespaces:
   - '*'
 EOF"
+
+# hide the evidences
+clear
 
 # Create Tanzu-RabbitMQ SA
 pe 'kubectl create -f - <<EOF
@@ -410,6 +452,9 @@ subjects:
   namespace: tanzu-rabbitmq-package
 EOF'
 
+# hide the evidences
+clear
+
 # Create Tanzu-RabbitMQ PackageInstall
 pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
 ---
@@ -436,6 +481,9 @@ stringData:
     ---
     namespace: rabbitmq-system
 EOF"
+
+# hide the evidences
+clear
 
 # Createthe first RabbitMQ Cluster
 pe 'kubectl create -f - <<EOF
@@ -464,6 +512,9 @@ spec:
   - name: tanzu-rabbitmq-registry-creds
 EOF'
 
+# hide the evidences
+clear
+
 # Create the RabbitMQ Broker for Knative
 pe "kubectl create -f - <<EOF
 ---
@@ -484,6 +535,9 @@ spec:
     retry: 2
     backoffPolicy: linear
 EOF"
+
+# hide the evidences
+clear
 
 # Create a first broker MTChannelBasedBroker
 # pe "kubectl -n vmware-functions create -f - <<EOF
@@ -513,6 +567,9 @@ pe "kn vsphere auth create \
 --verify-url https://vcsa.cpod-nsxv8.az-stc.cloud-garage.net \
 --verify-insecure"
 
+# hide the evidences
+clear
+
 # Create a new vSphereSource
 pe "kn vsphere source create \
 --namespace vmware-functions \
@@ -522,6 +579,9 @@ pe "kn vsphere source create \
 --secret-ref vcsa-cpod-ro-creds \
 --sink-uri http://rabbitmq-broker-broker-ingress.vmware-functions.svc.cluster.local \
 --encoding json"
+
+# hide the evidences
+clear
 
 # Install Event-Viewer Sockeye
 pe "kubectl -n vmware-functions create -f - <<EOF
@@ -575,11 +635,17 @@ spec:
       name: sockeye
 EOF"
 
+# hide the evidences
+clear
+
 # Show assigned Load Balancer IP for Sockeye
 pe "kubectl -n vmware-functions get svc"
 
 # Create tagging Secret
 pe "kubectl -n vmware-functions create secret generic tag-secret --from-file=TAG_SECRET=tag_secret.json"
+
+# hide the evidences
+clear
 
 # Create Tagging Function
 pe "kubectl -n vmware-functions create -f - <<EOF
@@ -622,6 +688,9 @@ spec:
       kind: Service
       name: kn-pcli-tag
 EOF"
+
+# hide the evidences
+clear
 
 # Finish
 pei "figlet 'Eventing is the sh**' | lolcat"
