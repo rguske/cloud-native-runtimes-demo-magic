@@ -9,25 +9,29 @@
 #
 # see http://www.tldp.org/HOWTO/Bash-Prompt-HOWTO/bash-prompt-escape-sequences.html for escape sequences
 #
-DEMO_PROMPT="${BLUE}➜ ${BLUE}\W "
+DEMO_PROMPT="${GREEN}➜ ${CYAN}\W "
 
-pei "echo 'Enter the Hostname (FQDN) of your private registry (e.g. registry.cloud-garage.net)'"
+# Before you begin
+echo "READ THE PREREQUISITES CAREFULLY --> https://github.com/rguske/cloud-native-runtimes-demo-magic#prerequisites"
+
+# Introdcucing the prerequisites
+echo "Enter the Hostname (FQDN) of your private registry (e.g. registry.cloud-garage.net)"
 read INSTALL_REGISTRY_HOSTNAME
 
-pei "echo 'Enter the username which is going to be used for your private registry (e.g. cpod-dvc)'"
+echo "Enter the username which is going to be used for your private registry (e.g. cpod-svc)"
 read INSTALL_REGISTRY_USERNAME
 
-pei "echo 'Enter the password for the provided user'"
+echo "Enter the password for the provided user"
 read INSTALL_REGISTRY_PASSWORD
 
-pei "echo 'Enter the desired TAP version (e.g. 1.3.0)'"
+echo  "Enter the desired TAP version (e.g. 1.3.0)"
 read TAP_VERSION
 
-pei "echo 'Enter the desired TAP version (e.g. rguske/tap-packages)'"
+echo "Enter the repositoryname in which the packages are located (e.g. rguske/tap-packages)"
 read INSTALL_REPO
 
 # hide the evidences
-clear
+pei "clear"
 
 # Export Registry and Repository Variales
 # export INSTALL_REGISTRY_USERNAME='cpod-svc' \
@@ -40,13 +44,13 @@ clear
 pei "figlet Preperations - Tanzu Packages  | lolcat"
 
 # Add the Tanzu Standard Repository
-pei "tanzu package repository add tanzu-standard --url projects.registry.vmware.com/tkg/packages/standard/repo:v1.6.0 -n tkg-system"
+pe "tanzu package repository add tanzu-standard --url projects.registry.vmware.com/tkg/packages/standard/repo:v1.6.0 -n tkg-system"
 
 # Show available packages
 pe "tanzu package available list -n tkg-system"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Install Cert-Manager
 pe "kubectl create -f - <<EOF
@@ -97,7 +101,7 @@ stringData:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Install Contour
 pe "kubectl create -f - <<EOF
@@ -172,7 +176,7 @@ stringData:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Show Load Balancer IP assignment for Envoy
 pe "kubectl -n tanzu-system-ingress get svc"
@@ -181,7 +185,7 @@ pe "kubectl -n tanzu-system-ingress get svc"
 pei "figlet Adjust your DNS Wildcard Record | lolcat"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create TAP Namespace
 pe "kubectl create ns tap-install"
@@ -194,7 +198,7 @@ pe "tanzu secret registry add tap-registry \
 --namespace tap-install"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Add the new Package Repository
 pe "tanzu package repository add tanzu-tap-repo \
@@ -202,7 +206,7 @@ pe "tanzu package repository add tanzu-tap-repo \
 --namespace tap-install"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Check the Repository Config
 pe "tanzu package repository get tanzu-tap-repo \
@@ -212,13 +216,13 @@ pe "tanzu package repository get tanzu-tap-repo \
 pe "tanzu package available get cnrs.tanzu.vmware.com --namespace tap-install"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Show CNR value file
 pe "cat values.yaml"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Install the CNR Package
 pe "tanzu package install cloud-native-runtimes \
@@ -229,7 +233,7 @@ pe "tanzu package install cloud-native-runtimes \
 --poll-timeout 30m"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Check Eventing version availability
 pe "tanzu package available get eventing.tanzu.vmware.com --namespace tap-install"
@@ -242,35 +246,42 @@ pe "tanzu package install eventing \
 --poll-timeout 30m"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create vmware-functions namespace
-pe "kubectl create ns vmware-functions"
+pei "kubectl create ns vmware-functions"
 
 # Create tanzu-rabbitmq-package namespace
-pe "kubectl create ns tanzu-rabbitmq-package"
+pei "kubectl create ns tanzu-rabbitmq-package"
 
 # Create tanzu-rabbitmq-package namespace
-pe "kubectl create ns tanzu-rabbitmq"
+pei "kubectl create ns tanzu-rabbitmq"
 
 # hide the evidences
-clear
+pe "clear"
 
-# Add Tanzu-RabbitMQ Package Repository
-pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
----
-apiVersion: packaging.carvel.dev/v1alpha1
-kind: PackageRepository
-metadata:
-  name: tanzu-rabbitmq-repo
-spec:
-  fetch:
-    imgpkgBundle:
-      image: registry.cloud-garage.net/jmanzaneque/tanzu-rabbitmq-package-repo:1.3.1
-EOF"
+# print out Tanzu Packages
+pei "figlet Tanzu RabbitMQ  | lolcat"
+
+echo "Creating a Registry Secret for the Tanzu RabbitMQ package installation"
+
+echo "Enter the Hostname (FQDN) of the registry as well as the repositoryname (default: registry.tanzu.vmware.com)"
+read RABBITMQ_REGISTRY_HOSTNAME
+
+echo "Enter the repositoryname in which the packages are located (default: p-rabbitmq-for-kubernetes/tanzu-rabbitmq-package-repo)"
+read RABBITMQ_REPO
+
+echo "Enter the version tag (e.g. 1.3.1)"
+read RABBITMQ_VERSION
+
+echo "Username to authenticate against registry"
+read RABBITMQ_REGISTRY_USERNAME
+
+echo "Password for the provided user"
+read RABBITMQ_REGISTRY_PASSWORD
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create Registry Secret for the Tanzu-RabbitMQ Repository
 pe 'kubectl create -f - <<EOF
@@ -285,17 +296,30 @@ stringData:
   .dockerconfigjson: |
     {
       "auths": {
-        "${INSTALL_REGISTRY_HOSTNAME}": {
-          "username": "${INSTALL_REGISTRY_USERNAME}",
-          "password": "${INSTALL_REGISTRY_PASSWORD}",
+        "${RABBITMQ_REGISTRY_HOSTNAME}": {
+          "username": "${RABBITMQ_REGISTRY_USERNAME}",
+          "password": "${RABBITMQ_REGISTRY_PASSWORD}",
           "auth": ""
         }
       }
     }
 EOF'
 
+# Add Tanzu-RabbitMQ Package Repository
+pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
+---
+apiVersion: packaging.carvel.dev/v1alpha1
+kind: PackageRepository
+metadata:
+  name: tanzu-rabbitmq-repo
+spec:
+  fetch:
+    imgpkgBundle:
+      image: ${RABBITMQ_REGISTRY_HOSTNAME}/${RABBITMQ_REPO}:${RABBITMQ_VERSION}
+EOF"
+
 # hide the evidences
-clear
+pe "clear"
 
 # Export the Secret to every Namespace
 pe "kubectl create -f - <<EOF
@@ -311,7 +335,7 @@ spec:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create Tanzu-RabbitMQ SA
 pe 'kubectl create -f - <<EOF
@@ -453,7 +477,7 @@ subjects:
 EOF'
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create Tanzu-RabbitMQ PackageInstall
 pe "kubectl -n tanzu-rabbitmq-package create -f - <<EOF
@@ -483,7 +507,7 @@ stringData:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Createthe first RabbitMQ Cluster
 pe 'kubectl create -f - <<EOF
@@ -513,7 +537,7 @@ spec:
 EOF'
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create the RabbitMQ Broker for Knative
 pe "kubectl create -f - <<EOF
@@ -537,7 +561,7 @@ spec:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create a first broker MTChannelBasedBroker
 # pe "kubectl -n vmware-functions create -f - <<EOF
@@ -558,30 +582,39 @@ clear
 # Print out Tanzu Sources for Knative
 pei "figlet Tanzu Sources for Knative | lolcat"
 
+echo "Enter vCenter hostname (e.g. vcsa.cpod-nsxv8.az-stc.cloud-garage.net)"
+read VCENTER_HOSTNAME
+
+echo "Enter the username (read-only is sufficient) which is going to be used for the vCenter Server connection (e.g. kn-ro@cpod-nsxv8.az-stc.cloud-garage.net)"
+read VCENTER_USERNAME
+
+echo "Enter the username (read-only is sufficient) which is going to be used for the vCenter Server connection (e.g. kn-ro@cpod-nsxv8.az-stc.cloud-garage.net)"
+read VCENTER_PASSWORD
+
 # Create an Auth-Secret
 pe "kn vsphere auth create \
 --namespace vmware-functions \
---username 'kn-ro@cpod-nsxv8.az-stc.cloud-garage.net' \
---password 'VMware1!' \
---name vcsa-cpod-ro-creds \
---verify-url https://vcsa.cpod-nsxv8.az-stc.cloud-garage.net \
+--username '${VCENTER_USERNAME}' \
+--password '${VCENTER_PASSWORD}' \
+--name vcsa-ro-creds \
+--verify-url https://${VCENTER_HOSTNAME} \
 --verify-insecure"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create a new vSphereSource
 pe "kn vsphere source create \
 --namespace vmware-functions \
---name vcsa-nsxv8 \
---vc-address https://vcsa.cpod-nsxv8.az-stc.cloud-garage.net \
+--name vcsa-source \
+--vc-address https://${VCENTER_HOSTNAME} \
 --skip-tls-verify \
---secret-ref vcsa-cpod-ro-creds \
+--secret-ref vcsa-ro-creds \
 --sink-uri http://rabbitmq-broker-broker-ingress.vmware-functions.svc.cluster.local \
 --encoding json"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Install Event-Viewer Sockeye
 pe "kubectl -n vmware-functions create -f - <<EOF
@@ -636,16 +669,17 @@ spec:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Show assigned Load Balancer IP for Sockeye
-pe "kubectl -n vmware-functions get svc"
+echo "The assigned IP for the Sockeye application is:"
+pe "kubectl -n vmware-functions get svc -l app=sockeye"
 
 # Create tagging Secret
 pe "kubectl -n vmware-functions create secret generic tag-secret --from-file=TAG_SECRET=tag_secret.json"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Create Tagging Function
 pe "kubectl -n vmware-functions create -f - <<EOF
@@ -690,7 +724,7 @@ spec:
 EOF"
 
 # hide the evidences
-clear
+pe "clear"
 
 # Finish
 pei "figlet 'Eventing is the sh**' | lolcat"

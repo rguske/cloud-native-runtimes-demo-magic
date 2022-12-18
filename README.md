@@ -2,25 +2,35 @@
 
 This demo-magic script will install the following solutions, as VMware Packages (Carvel), automagically 🪄
 
-## Prerequisites
+## Prerequisites - General
 
-* the biggest part of the necessary prerequisites is the relocation of the Tanzu Packages for Tanzu Application Platform
-  * Perform these steps first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
+* internet access is required in order to add the public Tanzu Packages repository (`tanzu package repository add`)
+* the biggest part of the necessary prerequisites is the relocation of the Tanzu Packages for Tanzu Application Platform as well as for RabbitMQ
+  * perform these steps first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
+  * Perform the relocation task for the [RabbitMQ package repository](https://docs.vmware.com/en/VMware-Tanzu-RabbitMQ-for-Kubernetes/1.3/tanzu-rmq/GUID-installation.html#install-the-packagerepository) as well
+  * you can find a how-to guide here - [LINK](https://rguske.github.io/post/deploy-tanzu-packages-from-a-private-registry/#making-packages-offline-available)
 * running Kubernetes cluster with enough capacity (compute)
-  * I'd recommend at least two large worker-nodes (e.g. 2-4 vCPUs and 8 - 16GB vRAM each)
-* a configured default `StorageClass` in Kubernetes
+  * I'd recommend at least 3x large worker-nodes (e.g. 4-8 vCPUs and 8 - 16GB vRAM each)
+* a configured default `StorageClass` in Kubernetes (for the `pvc`'s created by Tanzu RabbitMQ)
   * `kubectl patch storageclass gold -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'`
-  * we need `persistentVolumes` for RabbitMQ
 * a Load Balancer solution in place
-  * we need VIP's for various services
+  * we need VIP's for various services (like e.g. Sockeye)
 * the possibility to configure a [DNS Wildcard Record](https://en.wikipedia.org/wiki/Wildcard_DNS_record)
+  * adjust the `domain_name` value in the `values.yaml` with your data
 * an existing vSphere Tag (mine: `backup-basic-sla`) which will be used by the example tagging-function in the script
   * I also created a dedicated service-user (`svc-tagging`) which will be used by the tagging operation
+  * adjust the values in the `tag_secret.json` file with your tag and user data
 * a `ReadOnly` user in vSphere which we'll use in order to connect the `VsphereSource` to the vCenter Server (Event API)
+
+### Prerequisites - CLI
+
+* the `demo-magic` scripts requires pipeviewer (`pv`) - [Install](https://formulae.brew.sh/formula/pv) `pv` using `brew`
 * installed Knative (`kn`) CLI - [LINK](https://knative.dev/docs/client/install-kn/)
 * `kn vsphere` [Plugin installed](https://github.com/vmware-tanzu/sources-for-knative/tree/main/plugins/vsphere) - [LINK](https://github.com/vmware-tanzu/sources-for-knative/releases)
   * download the binary and `mv` it to `/usr/local/bin/` (on Linux)
-* internet access is required
+* I'm also using the cli fun-tools `figlet` as well as `lolcat` within the script
+  * `brew install` ...
+
 
 ## VMware Packages and Versions
 
