@@ -179,7 +179,7 @@ EOF"
 pe "clear"
 
 # Show Load Balancer IP assignment for Envoy
-pe "kubectl -n tanzu-system-ingress get svc"
+pe "kubectl get service envoy -n tanzu-system-ingress --output 'jsonpath={.status.loadBalancer.ingress[0].ip}'"
 
 # Show DNS Wildcard Config for CNR
 pei "figlet Adjust your DNS Wildcard Record | lolcat"
@@ -205,11 +205,8 @@ pe "tanzu package repository add tanzu-tap-repo \
 --url ${INSTALL_REGISTRY_HOSTNAME}/${INSTALL_REPO}:$TAP_VERSION \
 --namespace tap-install"
 
-# hide the evidences
-pe "clear"
-
 # Check the Repository Config
-pe "tanzu package repository get tanzu-tap-repo \
+pei "tanzu package repository get tanzu-tap-repo \
 --namespace tap-install"
 
 # Check CNR version availability
@@ -588,8 +585,11 @@ read VCENTER_HOSTNAME
 echo "Enter the username (read-only is sufficient) which is going to be used for the vCenter Server connection (e.g. kn-ro@cpod-nsxv8.az-stc.cloud-garage.net)"
 read VCENTER_USERNAME
 
-echo "Enter the username (read-only is sufficient) which is going to be used for the vCenter Server connection (e.g. kn-ro@cpod-nsxv8.az-stc.cloud-garage.net)"
+echo "Enter the password for the provided user"
 read VCENTER_PASSWORD
+
+# hide the evidences
+pe "clear"
 
 # Create an Auth-Secret
 pe "kn vsphere auth create \
@@ -673,7 +673,7 @@ pe "clear"
 
 # Show assigned Load Balancer IP for Sockeye
 echo "The assigned IP for the Sockeye application is:"
-pe "kubectl -n vmware-functions get svc -l app=sockeye"
+pei "kubectl -n vmware-functions get svc -l app=sockeye"
 
 # Create tagging Secret
 pe "kubectl -n vmware-functions create secret generic tag-secret --from-file=TAG_SECRET=tag_secret.json"

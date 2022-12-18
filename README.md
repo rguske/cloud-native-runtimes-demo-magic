@@ -8,8 +8,9 @@ This demo-magic script will install the following solutions, as VMware Packages 
 * the biggest part of the necessary prerequisites is the relocation of the Tanzu Packages for Tanzu Application Platform as well as for RabbitMQ
   * perform these steps first! [Installing Tanzu Application Platform package and profiles](https://docs.vmware.com/en/VMware-Tanzu-Application-Platform/1.3/tap/GUID-install.html#add-the-tanzu-application-platform-package-repository-1)
   * Perform the relocation task for the [RabbitMQ package repository](https://docs.vmware.com/en/VMware-Tanzu-RabbitMQ-for-Kubernetes/1.3/tanzu-rmq/GUID-installation.html#install-the-packagerepository) as well
-  * you can find a how-to guide here - [LINK](https://rguske.github.io/post/deploy-tanzu-packages-from-a-private-registry/#making-packages-offline-available)
-* running Kubernetes cluster with enough capacity (compute)
+  * you can find a how-to-guide here - [LINK](https://rguske.github.io/post/deploy-tanzu-packages-from-a-private-registry/#making-packages-offline-available)
+* the installation of the Tanzu RabbitMQ Package from the VMware repository requires a valid [Tanzu Network](https://network.pivotal.io/) account
+* a running Kubernetes cluster with enough capacity (compute)
   * I'd recommend at least 3x large worker-nodes (e.g. 4-8 vCPUs and 8 - 16GB vRAM each)
 * a configured default `StorageClass` in Kubernetes (for the `pvc`'s created by Tanzu RabbitMQ)
   * `kubectl patch storageclass gold -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'`
