@@ -12,8 +12,6 @@ This demo-magic script will install the following solutions, as VMware Packages 
 * the installation of the Tanzu RabbitMQ Package from the VMware repository requires a valid [Tanzu Network](https://network.pivotal.io/) account
 * a running Kubernetes cluster with enough capacity (compute)
   * I'd recommend at least 3x large worker-nodes (e.g. 4-8 vCPUs and 8 - 16GB vRAM each)
-* a configured default `StorageClass` in Kubernetes (for the `pvc`'s created by Tanzu RabbitMQ)
-  * `kubectl patch storageclass gold -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'`
 * a Load Balancer solution in place
   * we need VIP's for various services (like e.g. Sockeye)
 * the possibility to configure a [DNS Wildcard Record](https://en.wikipedia.org/wiki/Wildcard_DNS_record)

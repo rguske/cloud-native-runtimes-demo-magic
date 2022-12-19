@@ -528,6 +528,9 @@ metadata:
   annotations:
     rabbitmq.com/topology-allowed-namespaces: "vmware-functions"
 spec:
+  persistence:
+    storageClassName: ${RABBITMQ_STORAGE}
+    storage: 20Gi
   replicas: 1
   imagePullSecrets:
   - name: tanzu-rabbitmq-registry-creds
