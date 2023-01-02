@@ -2,100 +2,100 @@
 
 set -euo pipefail
 
-# kubectl -n vmware-functions delete -f - <<EOF
-# apiVersion: serving.knative.dev/v1
-# kind: Service
-# metadata:
-#   name: kn-pcli-tag
-#   labels:
-#     app: veba-ui
-# spec:
-#   template:
-#     metadata:
-#       annotations:
-#         autoscaling.knative.dev/maxScale: '1'
-#         autoscaling.knative.dev/minScale: '1'
-#     spec:
-#       containers:
-#         - image: us.gcr.io/daisy-284300/veba/kn-pcli-tag:1.4
-#           envFrom:
-#             - secretRef:
-#                 name: tag-secret
-#           env:
-#             - name: FUNCTION_DEBUG
-#               value: 'false'
-# ---
-# apiVersion: eventing.knative.dev/v1
-# kind: Trigger
-# metadata:
-#   name: veba-pcli-tag-trigger
-#   labels:
-#     app: veba-ui
-# spec:
-#   broker: rabbitmq-broker
-#   filter:
-#     attributes:
-#       type: com.vmware.vsphere.DrsVmPoweredOnEvent.v0
-#   subscriber:
-#     ref:
-#       apiVersion: serving.knative.dev/v1
-#       kind: Service
-#       name: kn-pcli-tag
-# EOF
-# 
-# kubectl -n vmware-functions delete secret tag-secret
-# 
-# kubectl -n vmware-functions delete -f - <<EOF
-# apiVersion: apps/v1
-# kind: Deployment
-# metadata:
-#   labels:
-#     app: sockeye
-#   name: sockeye
-# spec:
-#   replicas: 1
-#   selector:
-#     matchLabels:
-#       app: sockeye
-#   template:
-#     metadata:
-#       labels:
-#         app: sockeye
-#     spec:
-#       containers:
-#       - image: registry.cloud-garage.net/rguske/sockeye:v0.7.0
-#         name: sockeye
-#         ports:
-#           - containerPort: 8080
-# ---
-# apiVersion: v1
-# kind: Service
-# metadata:
-#   labels:
-#     app: sockeye
-#   name: sockeye
-# spec:
-#   ports:
-#   - port: 80
-#     protocol: TCP
-#     targetPort: 8080
-#   selector:
-#     app: sockeye
-#   type: LoadBalancer
-# ---
-# apiVersion: eventing.knative.dev/v1
-# kind: Trigger
-# metadata:
-#   name: sockeye-trigger
-# spec:
-#   broker: rabbitmq-broker
-#   subscriber:
-#     ref:
-#       apiVersion: v1
-#       kind: Service
-#       name: sockeye
-# EOF
-# 
+kubectl -n vmware-functions delete -f - <<EOF
+apiVersion: serving.knative.dev/v1
+kind: Service
+metadata:
+  name: kn-pcli-tag
+  labels:
+    app: veba-ui
+spec:
+  template:
+    metadata:
+      annotations:
+        autoscaling.knative.dev/maxScale: '1'
+        autoscaling.knative.dev/minScale: '1'
+    spec:
+      containers:
+        - image: us.gcr.io/daisy-284300/veba/kn-pcli-tag:1.4
+          envFrom:
+            - secretRef:
+                name: tag-secret
+          env:
+            - name: FUNCTION_DEBUG
+              value: 'false'
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: veba-pcli-tag-trigger
+  labels:
+    app: veba-ui
+spec:
+  broker: rabbitmq-broker
+  filter:
+    attributes:
+      type: com.vmware.vsphere.DrsVmPoweredOnEvent.v0
+  subscriber:
+    ref:
+      apiVersion: serving.knative.dev/v1
+      kind: Service
+      name: kn-pcli-tag
+EOF
+
+kubectl -n vmware-functions delete secret tag-secret
+
+kubectl -n vmware-functions delete -f - <<EOF
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: sockeye
+  name: sockeye
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: sockeye
+  template:
+    metadata:
+      labels:
+        app: sockeye
+    spec:
+      containers:
+      - image: registry.cloud-garage.net/rguske/sockeye:v0.7.0
+        name: sockeye
+        ports:
+          - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: sockeye
+  name: sockeye
+spec:
+  ports:
+  - port: 80
+    protocol: TCP
+    targetPort: 8080
+  selector:
+    app: sockeye
+  type: LoadBalancer
+---
+apiVersion: eventing.knative.dev/v1
+kind: Trigger
+metadata:
+  name: sockeye-trigger
+spec:
+  broker: rabbitmq-broker
+  subscriber:
+    ref:
+      apiVersion: v1
+      kind: Service
+      name: sockeye
+EOF
+
 kn vsphere source delete --name vcsa-source -n vmware-functions
 
 kn vsphere auth delete --name vcsa-ro-creds -n vmware-functions
