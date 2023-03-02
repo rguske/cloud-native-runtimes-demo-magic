@@ -24,10 +24,10 @@ read INSTALL_REGISTRY_USERNAME
 echo "Enter the password for the provided user"
 read INSTALL_REGISTRY_PASSWORD
 
-echo  "Enter the desired TAP version (e.g. 1.3.0)"
+echo  "Enter the desired TAP version (e.g. 1.4.0)"
 read TAP_VERSION
 
-echo "Enter the repositoryname in which the packages are located (e.g. rguske/tap-packages)"
+echo "Enter the repositoryname in which the packages are located (e.g. rguske/tap-packages/tap-packages)"
 read INSTALL_REPO
 
 # hide the evidences
@@ -224,7 +224,7 @@ pe "clear"
 # Install the CNR Package
 pe "tanzu package install cloud-native-runtimes \
 -p cnrs.tanzu.vmware.com \
--v 2.0.1 \
+-v 2.1.0 \
 -n tap-install \
 -f values.yaml \
 --poll-timeout 30m"
@@ -238,7 +238,7 @@ pe "tanzu package available get eventing.tanzu.vmware.com --namespace tap-instal
 # Install the Eventing Package
 pe "tanzu package install eventing \
 -p eventing.tanzu.vmware.com \
--v 2.0.1 \
+-v 2.1.1 \
 -n tap-install \
 --poll-timeout 30m"
 
