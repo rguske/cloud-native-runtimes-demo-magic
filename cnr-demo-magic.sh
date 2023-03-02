@@ -506,6 +506,10 @@ EOF"
 # hide the evidences
 pe "clear"
 
+# Specify your storage class
+echo "Enter the storageClass name here (e.g. ftt0-r0)"
+read RABBITMQ_STORAGE
+
 # Createthe first RabbitMQ Cluster
 pe 'kubectl create -f - <<EOF
 ---
